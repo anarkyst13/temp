@@ -1,0 +1,24 @@
+import React from 'react';
+import { Meta, StoryObj } from '@storybook/react';
+import { {{pascalCase name}} } from './{{pascalCase name}}';
+import { {{pascalCase name}}Props } from './{{pascalCase name}}.types';
+
+export default {
+  title: '{{#if (eq type "template")}}Templates/{{pascalCase name}}{{else if (eq type "page")}}Pages/{{pascalCase name}}{{else}}Components/{{properCase type}}s/{{pascalCase name}}{{/if}}',
+  component: {{pascalCase name}},
+  tags: ['autodocs'],
+  argTypes: {},
+  parameters: {
+    docs: {
+      description: {
+        component: 'Описание компонента {{pascalCase name}}.',
+      },
+    },
+  },
+} as Meta<typeof {{pascalCase name}}>;
+
+export const Default: StoryObj<typeof {{pascalCase name}}> = {
+  args: {
+    // Определите дефолтные пропсы здесь
+  },
+};

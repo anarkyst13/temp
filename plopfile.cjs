@@ -1,68 +1,96 @@
-module.exports = function (plop) {
-    // Регистрация хелпера split
-    plop.setHelper("split", function (str, delimiter) {
-        return str.split(delimiter);
-    });
+module.exports = function(plop) {
+  plop.setHelper('eq', function(a, b) {
+    return a === b;
+  });
 
-    // Хелпер для получения первого пропса с типом string
-    plop.setHelper("getTextProp", function (props) {
-        const propArray = props.split(",");
-        for (let prop of propArray) {
-            const [name, type] = prop.trim().split(":");
-            if (type === "string") return name;
-        }
-        return null;
-    });
+  plop.setGenerator('component', {
+    description: 'Создать новый компонент по Atomic Design',
+    prompts: [
+      {
+        type: 'list',
+        name: 'type',
+        message: 'Какой тип компонента?',
+        choices: ['atom', 'molecule', 'organism', 'template', 'page'],
+      },
+      {
+        type: 'input',
+        name: 'name',
+        message: 'Как назвать компонент?',
+      },
+    ],
+    actions: function(data) {
+      let basePath;
+      let filePath;
+      let actions = [];
 
-    plop.setGenerator("entity", {
-        description: "Generate a new entity (component, layout, page, section)",
-        prompts: [
-            {
-                type: "input",
-                name: "name",
-                message: "Enter the name of the entity (e.g., Button):",
-                validate: (value) =>
-                    value.length > 0 ? true : "Name is required",
-            },
-            {
-                type: "list",
-                name: "type",
-                message: "Select the type of entity:",
-                choices: ["component", "layout", "page", "section"],
-            },
-            {
-                type: "input",
-                name: "props",
-                message: "Enter props (e.g., text:string, onClick:() => void):",
-                default: "text:string",
-            },
-        ],
-        actions: [
-            {
-                type: "add",
-                path: "src/{{type}}s/{{pascalCase name}}/{{pascalCase name}}.tsx",
-                templateFile: "templates/entity.tsx.hbs",
-            },
-            {
-                type: "add",
-                path: "src/{{type}}s/{{pascalCase name}}/{{pascalCase name}}.styles.ts",
-                templateFile: "templates/entity.styles.ts.hbs",
-            },
-            {
-                type: "add",
-                path: "src/{{type}}s/{{pascalCase name}}/{{pascalCase name}}.stories.tsx",
-                templateFile: "templates/entity.stories.tsx.hbs",
-            },
-            {
-                type: "add",
-                path: "src/{{type}}s/{{pascalCase name}}/types.ts",
-                templateFile: "templates/types.ts.hbs",
-            },
-            {
-                type: "add",
-                path: "src/{{type}}s/{{pascalCase name}}/index.ts",
-                templateFile: "templates/index.ts.hbs",
-            },
-        ],
-    });
+      if (['atom', 'molecule', 'organism'].includes(data.type)) {
+        basePath = `src/components/${data.type}s/`;
+        filePath = `${basePath}{{pascalCase name}}/`;
+        actions.push(
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.tsx`,
+            templateFile: 'plop-templates/component.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.types.ts`,
+            templateFile: 'plop-templates/component.types.ts.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.stories.tsx`,
+            templateFile: 'plop-templates/component.stories.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.test.tsx`,
+            templateFile: 'plop-templates/component.test.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}index.ts`,
+            templateFile: 'plop-templates/index.ts.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.styles.ts`,
+            templateFile: 'plop-templates/component.styles.ts.hbs',
+          }
+        );
+      } else if (data.type === 'template' || data.type === 'page') {
+        basePath = data.type === 'template' ? 'src/templates/' : 'src/pages/';
+        filePath = basePath;
+        actions.push(
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.tsx`,
+            templateFile: 'plop-templates/component.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.types.ts`,
+            templateFile: 'plop-templates/component.types.ts.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.stories.tsx`,
+            templateFile: 'plop-templates/component.stories.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: `${filePath}{{pascalCase name}}.test.tsx`,
+            templateFile: 'plop-templates/component.test.tsx.hbs',
+          },
+          {
+            type: 'add',
+            path: 'src/components/{{pascalCase name}}/{{pascalCase name}}.styles.ts',
+            templateFile: 'plop-templates/component.styles.ts.hbs',
+          },
+        );
+      }
+
+      return actions;
+    },
+  });
 };
